@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -23,18 +25,31 @@ import java.net.URI;
 public class VideoProcessorConfig {
 
     private final String queueName;
+    private final String aws_region;
+    private final String aws_accesskey;
+    private final String aws_keyid;
 
-    public VideoProcessorConfig(@Value("${cloud.aws.sqs.queue}")String queueName) {
+    public VideoProcessorConfig(@Value("${cloud.aws.sqs.queue}")String queueName, @Value("${cloud.aws.region}")String aws_region, @Value("${cloud.aws.accesskey}")String awsAccesskey, @Value("${cloud.aws.keyid}")String awsKeyid) {
         this.queueName = queueName;
+        this.aws_region = aws_region;
+        aws_accesskey = awsAccesskey;
+        aws_keyid = awsKeyid;
     }
 
     @Bean
-    public S3Client s3Client() {
+    public S3Client s3Client(@Value("${cloud.aws.endpoint}") String endpoint) {
         return S3Client.builder()
-                .region(Region.US_EAST_1) // Mesma região do LocalStack
-                .endpointOverride(URI.create("http://localhost:4566")) // Aponta para o LocalStack
-                .forcePathStyle(true) // Evita redirecionamentos desnecessários
+                .region(Region.of(System.getenv().getOrDefault("AWS_REGION", aws_region)))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(
+                                System.getenv().getOrDefault("AWS_ACCESS_KEY_ID", aws_keyid),
+                                System.getenv().getOrDefault("AWS_SECRET_ACCESS_KEY", aws_accesskey)
+                        )
+                ))
+                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", endpoint)))
+                .forcePathStyle(true) // Necessário para LocalStack
                 .build();
+
     }
 
 
@@ -94,10 +109,16 @@ public class VideoProcessorConfig {
     }
 
     @Bean
-    public SqsClient sqsClient() {
+    public SqsClient sqsClient(@Value("${cloud.aws.endpoint}") String endpoint) {
         return SqsClient.builder()
-                .region(Region.US_EAST_1) // Mesma região do LocalStack
-                .endpointOverride(URI.create("http://localhost:4566")) // Apontando para o LocalStack
+                .region(Region.of(System.getenv().getOrDefault("AWS_REGION", aws_region)))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(
+                                System.getenv().getOrDefault("AWS_ACCESS_KEY_ID", aws_keyid),
+                                System.getenv().getOrDefault("AWS_SECRET_ACCESS_KEY", aws_accesskey)
+                        )
+                ))
+                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", endpoint)))
                 .build();
     }
 
@@ -111,14 +132,16 @@ public class VideoProcessorConfig {
 
     @Bean
     public String createQueue(SqsClient sqsClient) {
+        String queueUrl = null;
         try {
-            String queueUrl = sqsClient.getQueueUrl(GetQueueUrlRequest.builder().queueName(queueName).build()).queueUrl();
-            return queueUrl;
+            queueUrl = sqsClient.getQueueUrl(GetQueueUrlRequest.builder().queueName(queueName).build()).queueUrl();
+
         } catch (Exception e) {
 
-            String queueUrl = sqsClient.createQueue(CreateQueueRequest.builder().queueName(queueName).build()).queueUrl();
-            return queueUrl;
+            queueUrl = sqsClient.createQueue(CreateQueueRequest.builder().queueName(queueName).build()).queueUrl();
+
         }
+        return queueUrl;
     }
 
 }

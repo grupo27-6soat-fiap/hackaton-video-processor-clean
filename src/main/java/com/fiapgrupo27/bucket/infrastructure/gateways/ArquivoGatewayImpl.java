@@ -16,7 +16,7 @@ public class ArquivoGatewayImpl implements ArquivoGateway {
 
         String command = String.format(
                 // "ffmpeg -i %s -vf fps=1/1 %s/frame_%%04d.jpg",
-                "ffmpeg -i %s -vf fps=1/2 %s/%s_%%04d.jpg",
+                "ffmpeg -i %s -vf fps=1/4 %s/%s_%%04d.jpg",
                 videoPath, outputDir, baseName
         );
 
