@@ -5,7 +5,6 @@ import com.fiapgrupo27.bucket.application.gateways.ArquivoGateway;
 import com.fiapgrupo27.bucket.application.gateways.BucketGateway;
 import com.fiapgrupo27.bucket.application.gateways.SolicitacaoGateway;
 import com.fiapgrupo27.bucket.application.usecases.*;
-import com.fiapgrupo27.bucket.infrastructure.gateways.BucketGatewayImpl;
 import com.fiapgrupo27.bucket.infrastructure.messaging.SQSListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,16 +27,18 @@ public class VideoProcessorConfig {
     private final String aws_region;
     private final String aws_accesskey;
     private final String aws_keyid;
+    private final String aws_endpoint;
 
-    public VideoProcessorConfig(@Value("${cloud.aws.sqs.queue}")String queueName, @Value("${cloud.aws.region}")String aws_region, @Value("${cloud.aws.accesskey}")String awsAccesskey, @Value("${cloud.aws.keyid}")String awsKeyid) {
+    public VideoProcessorConfig(@Value("${cloud.aws.sqs.queue}")String queueName, @Value("${cloud.aws.region}")String aws_region, @Value("${cloud.aws.accesskey}")String awsAccesskey, @Value("${cloud.aws.keyid}")String awsKeyid, @Value("${cloud.aws.endpoint}")String aws_endpoint) {
         this.queueName = queueName;
         this.aws_region = aws_region;
-        aws_accesskey = awsAccesskey;
-        aws_keyid = awsKeyid;
+        this.aws_accesskey = awsAccesskey;
+        this.aws_keyid = awsKeyid;
+        this.aws_endpoint = aws_endpoint;
     }
 
     @Bean
-    public S3Client s3Client(@Value("${cloud.aws.endpoint}") String endpoint) {
+    public S3Client s3Client() {
         return S3Client.builder()
                 .region(Region.of(System.getenv().getOrDefault("AWS_REGION", aws_region)))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -46,7 +47,7 @@ public class VideoProcessorConfig {
                                 System.getenv().getOrDefault("AWS_SECRET_ACCESS_KEY", aws_accesskey)
                         )
                 ))
-                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", endpoint)))
+                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", aws_endpoint)))
                 .forcePathStyle(true) // Necessário para LocalStack
                 .build();
 
@@ -109,7 +110,7 @@ public class VideoProcessorConfig {
     }
 
     @Bean
-    public SqsClient sqsClient(@Value("${cloud.aws.endpoint}") String endpoint) {
+    public SqsClient sqsClient() {
         return SqsClient.builder()
                 .region(Region.of(System.getenv().getOrDefault("AWS_REGION", aws_region)))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -118,7 +119,7 @@ public class VideoProcessorConfig {
                                 System.getenv().getOrDefault("AWS_SECRET_ACCESS_KEY", aws_accesskey)
                         )
                 ))
-                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", endpoint)))
+                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", aws_endpoint)))
                 .build();
     }
 
@@ -132,7 +133,7 @@ public class VideoProcessorConfig {
 
     @Bean
     public String createQueue(SqsClient sqsClient) {
-        String queueUrl = null;
+        String queueUrl;
         try {
             queueUrl = sqsClient.getQueueUrl(GetQueueUrlRequest.builder().queueName(queueName).build()).queueUrl();
 
