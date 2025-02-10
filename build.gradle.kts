@@ -35,6 +35,20 @@ dependencies {
 
     // Testes com JUnit
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // Dependências de teste
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")  // JUnit 5 API
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")  // JUnit 5 Engine
+    testImplementation("org.springframework.boot:spring-boot-starter-test") // JUnit 5 e Mockito já inclusos
+    testImplementation("org.mockito:mockito-core:4.6.1")
+    
+    //cucumber
+    testImplementation("io.cucumber:cucumber-java:7.13.0")
+    testImplementation("io.cucumber:cucumber-spring:7.13.0")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.13.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.assertj:assertj-core:3.23.1")
+    testImplementation("org.junit.platform:junit-platform-suite:1.10.0")
+    testImplementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {
