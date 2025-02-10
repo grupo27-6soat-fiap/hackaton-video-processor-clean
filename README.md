@@ -42,7 +42,7 @@ Para desenvolver este software, utilizamos a metodologia DDD (Domain-Driven Desi
 [![Swagger](https://img.shields.io/badge/Swagger-%2380BFFF.svg?style=for-the-badge&logo=swagger&logoColor=white)](http://localhost:30002/swagger-ui/index.html)
 
 ## Domain-driven design
-![image](https://github.com/grupo27-6soat-fiap/foodtech/blob/master/driver.png)
+![image](https://github.com/grupo27-6soat-fiap/hackaton-video-processor-clean/blob/master/Brainstorming.jpg)
 
 # Para acessar a Collection da API Postman clique na imagem:
 [![Postman](https://img.shields.io/badge/Postman-%23FF6C37.svg?style=for-the-badge&logo=postman&logoColor=white)
