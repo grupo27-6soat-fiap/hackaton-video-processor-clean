@@ -36,7 +36,7 @@ public class S3Adapter {
             Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erro ao tentar baixar o arquivo", e);
         }
 
         if (!Files.exists(tempFile)) {

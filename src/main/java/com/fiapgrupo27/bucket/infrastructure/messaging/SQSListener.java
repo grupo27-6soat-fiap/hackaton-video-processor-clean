@@ -55,7 +55,12 @@ public class SQSListener {
         }
     }
 
-    private void processMessage(String messageBody) {
+    public void processMessage(String messageBody) {
+        
+        if (messageBody == null || messageBody.isEmpty()) {
+            throw new IllegalArgumentException("Mensagem vazia ou nula recebida");
+        }
+        
         System.out.println("Received message: " + messageBody);
 
         try {
