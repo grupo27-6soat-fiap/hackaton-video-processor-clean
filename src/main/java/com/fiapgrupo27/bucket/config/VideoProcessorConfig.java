@@ -47,7 +47,7 @@ public class VideoProcessorConfig {
                                 System.getenv().getOrDefault("AWS_SECRET_ACCESS_KEY", aws_accesskey)
                         )
                 ))
-                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", aws_endpoint)))
+//                .endpointOverride(URI.create(endpoint))
                 .forcePathStyle(true) // Necessário para LocalStack
                 .build();
 
@@ -111,6 +111,15 @@ public class VideoProcessorConfig {
 
     @Bean
     public SqsClient sqsClient() {
+        String endpoint = System.getenv().getOrDefault("AWS_ENDPOINT_URL", aws_endpoint);
+        if (endpoint.contains("amazonaws.com")) {
+            endpoint = String.format(endpoint, "sqs", aws_region);;
+        }
+
+        System.out.println("ENDPOINT SQS ======== " + endpoint);
+
+
+
         return SqsClient.builder()
                 .region(Region.of(System.getenv().getOrDefault("AWS_REGION", aws_region)))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -119,7 +128,7 @@ public class VideoProcessorConfig {
                                 System.getenv().getOrDefault("AWS_SECRET_ACCESS_KEY", aws_accesskey)
                         )
                 ))
-                .endpointOverride(URI.create(System.getenv().getOrDefault("AWS_ENDPOINT_URL", aws_endpoint)))
+//                .endpointOverride(URI.create(endpoint))
                 .build();
     }
 
@@ -136,11 +145,11 @@ public class VideoProcessorConfig {
         String queueUrl;
         try {
             queueUrl = sqsClient.getQueueUrl(GetQueueUrlRequest.builder().queueName(queueName).build()).queueUrl();
-
+            System.out.println("===================  QUEUE URL: " + queueUrl);
         } catch (Exception e) {
 
             queueUrl = sqsClient.createQueue(CreateQueueRequest.builder().queueName(queueName).build()).queueUrl();
-
+            System.out.println("===================  QUEUE URL: " + queueUrl);
         }
         return queueUrl;
     }

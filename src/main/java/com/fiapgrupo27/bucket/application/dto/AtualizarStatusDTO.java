@@ -3,9 +3,9 @@ package com.fiapgrupo27.bucket.application.dto;
 import com.fiapgrupo27.bucket.domain.enums.StatusSolicitacao;
 
 public class AtualizarStatusDTO {
-    private String idSolicitacao;
-    private String idArquivo;
-    private StatusSolicitacao status;
+    private final String idSolicitacao;
+    private final String idArquivo;
+    private final StatusSolicitacao status;
 
     public AtualizarStatusDTO(String idSolicitacao, String idArquivo, StatusSolicitacao status) {
         this.idSolicitacao = idSolicitacao;
