@@ -32,11 +32,10 @@
   
 # Sobre o projeto
 
-FoodTech é um projeto que desenvolve uma aplicação para um restaurante fast food, com ênfase na parte backend. Utilizamos Docker e aplicamos os conceitos de arquitetura hexagonal. Dentro dessa aplicação, documentamos as APIs usando o Swagger. Vale destacar que os requisitos fornecidos aos alunos não incluíam a parte de frontend.
-
-O objetivo deste projeto é implementar um sistema que atenda às necessidades dos clientes, incluindo funcionários, proprietários e usuários do restaurante. O sistema visa proporcionar autonomia, escalabilidade, resiliência e praticidade em todos os aspectos de sua implementação.
-
-Para desenvolver este software, utilizamos a metodologia DDD (Domain-Driven Design). Aplicando esses conceitos, conseguimos nos aprofundar nos requisitos e proporcionar uma experiência agradável e eficiente aos nossos clientes.
+MovieTech é um projeto que desenvolve uma aplicação de edição de Vídeos, com ênfase na parte backend. Utilizamos Docker e aplicamos os conceitos de arquitetura hexagonal. Dentro dessa aplicação, documentamos as APIs usando o Swagger. 
+Vale destacar que os requisitos fornecidos aos alunos não incluíam a parte de frontend.
+O objetivo deste projeto é implementar um sistema que atenda às necessidades dos Usuários. O sistema visa proporcionar autonomia, escalabilidade, resiliência e praticidade em todos os aspectos de sua implementação.
+Para desenvolver este software, utilizamos a metodologia DDD (Domain Driven Design). Aplicando esses conceitos, conseguimos nos aprofundar nos requisitos e proporcionar uma experiência agradável e eficiente aos nossos clientes.
 
 ### Link Swagger (Executar após rodar a aplicação no Kubernetes):
 [![Swagger](https://img.shields.io/badge/Swagger-%2380BFFF.svg?style=for-the-badge&logo=swagger&logoColor=white)](http://localhost:30002/swagger-ui/index.html)
@@ -47,10 +46,6 @@ Para desenvolver este software, utilizamos a metodologia DDD (Domain-Driven Desi
 # Para acessar a Collection da API Postman clique na imagem:
 [![Postman](https://img.shields.io/badge/Postman-%23FF6C37.svg?style=for-the-badge&logo=postman&logoColor=white)
 ](https://github.com/grupo27-6soat-fiap/FoodTech/blob/d3f3ef36e8a29110127a1fbbd6bbf869c77d5dfc/CollectionAPIPostman.json)
-
-# Para acessar o Miro clique na imagem:
-[![Miro](https://img.shields.io/badge/Miro-%2300B2A9.svg?style=for-the-badge&logo=miro&logoColor=white)
-](https://miro.com/app/board/uXjVKStNlQI=/?share_link_id=418037355467)
 
 # Arquitetura Infraestrutura Kubernetes:
 Visando atender os requisitos do nosso projeto utilizamos a arquitetura Kubernetes em conjunto com o Docker como provedor de infraestrutura, aproveitando ao máximo os recursos nativos oferecidos pela plataforma. Dentro do cluster Kubernetes, estabelecemos o namespace "food-techchallenge-api" para agrupar todos os recursos diretamente relacionados à nossa aplicação. Além disso, reservamos o namespace "db_techfood" para nosso banco de dados gerenciado internamente pelo Kubernetes. Dentro do namespace "food-techchallenge-api", adotamos uma abordagem de segmentação dos componentes com base em suas responsabilidades específicas, o que facilita a visualização e compreensão da nossa estrutura arquitetônica. Essa prática visa proporcionar uma organização clara e intuitiva dos elementos que compõem a aplicação. Na imagem abaixo ilustramos como está sendo arquitetado o processo e também a comunicação entre eles, onde estamos expondo para a internet na porta 30002 nossa aplicação Java com Springboot e intermante na temos a aplicação MySql sendo executada em um outro pode, para persistir os dados criamos um volume para o banco e toda essa comunicação da aplicação com a base de dados está sendo feita através das services, para provisionar uma escalabilidade ao nosso projeto estamos utilizando o HPA que é responsável por verificar as métricas dos pod's e criar replicas para atender a necessidade de requisições.
@@ -188,38 +183,29 @@ A seguir estão os passos para executar os workflows Terraform, que provisionam 
 
 
 
-
-
-
-
 ## Linguagem Ubíqua
  ```bash
-# Menu:
 
-- Combos: Uma refeição que está agrupada incluindo bebidas, acompanhamentos e o lanche.
-- Bebidas: Refrigerantes, sucos, água com e sem gás, chá e etc.
-- Lanche: Opções de sanduíches como: x-banco, x-salada, hamburguer.
-- Sobremsa: Opções de comida doces como por exemplo: sorvete, brigadeiro, bolo e etc.
-- Acompanhamento: Batata frita, Dadinho de tapioca, Onion rings, nuggets.
+Entidades e Papéis
 
-# Pedido:
+Usuário
+  •	Descrição: Pessoa que utiliza o sistema para editar vídeos.
+Ações Principais:
+  •	Criar Projeto: Iniciar um novo projeto de edição de vídeo.
+  •	Importar Mídia: Adicionar vídeos ao Editor.
+  •	Fazer Download do Vídeo: Exportar o vídeo editado em um formato final.
 
-- Balcão: Local onde o cliente pode retirar o pedido.
-- Cliente: Responsável por realizar o pedido e retirar a comida com o atendente.
-- Ticket: Número do pedido gerado após pagamento.
+Editor
+  •	Descrição: Sistema responsável por refinar o projeto, aplicar ajustes avançados e garantir a qualidade final.
+Ações Principais:
+  •	Acessar Projeto: Receber e abrir vídeos enviados pelo Usuário.
+  •	Gerenciar Camadas: Organizar elementos de vídeo com trechos específicos.
+  •	Compactar Arquivos: Gerar arquivo comprimido com os arquivos resultantes do processamento.
+  •	Disponibilizar o Projeto: Exportar a versão final com qualidade e formato ideais.
 
-# Cozinha:
-
-- Montagem do pedido: Momento em que o pedido do cliente começa ser montado pelos cozinheiros, para ser entregue ao cliente.
-- Cozinheiros: Responsáveis por cozinhar e realizar a montagem do pedido.
-- Controle de pedido: Onde os cozinheiros validam quais são os pedidos pendenes e finalizados.
-- Gestão de qualidade: Processo onde é validado a qualidade de cada ingrediente antes de inicializar o dia do restaurante.
-- Ingredientes: Tudo aquilo que compõem o pedido a ser montado e entregue para o cliente.
-
-# Pagamento:
-
-- Checkout: Onde o pagamento é realizado e validado para finalizar o pedido.
-- Gestão de pagamento: Onde é realizado a validação e controle das formas de pagamentos aceitas para o restaurante.
-- Cupom fiscal: Documento que é gerado caso o cliente deseje ter o  documento após realizar o pagamento.
-- Formas de pagamento: Dinheiro, pix, cartão de crédito, cartã de débito.
+Processamento
+  •	Descrição: Módulo automatizado que executa tarefas técnicas no sistema.
+Ações Principais:
+  •	Processar Vídeo: Combinar todas as camadas e efeitos em um arquivo final.
+  •	Gerar Arquivos: Gerar imagens de acordo com o formato definido na regra de negócio
 ```
