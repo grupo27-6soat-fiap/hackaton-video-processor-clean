@@ -1,4 +1,4 @@
-name: VideoProcessor_Build
+name: VideoService_Build
 
 on:
   push:
@@ -39,55 +39,8 @@ jobs:
       - name: Build with Gradle
         run: |
           ./gradlew build --no-daemon
-
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Package
           path: build/libs
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push the image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ steps.commit.outputs.short }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          echo "Pushing image to ECR..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-      - name: Update kube config
-        run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
-
-      - name: Deploy to EKS
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ steps.commit.outputs.short }}
-          RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
-        run: |
-    
-          sed -i.bak "s|xxx/lanchonete-myapp:1.0.8|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/deployment-app.yml && \
-          sed -i.bak "s|jdbc:postgresql://postgres-svc:5432/postgres|jdbc:postgresql://$RDS_HOSTNAME:5432/postgres|g" k8s/deployment-app.yml && \
-          kubectl apply -f k8s/secret-postgress.yml && \
-          kubectl apply -f k8s/secret-payment.yml && \
-          kubectl apply -f k8s/deployment-app.yml && \
-          kubectl apply -f k8s/service-app.yml && \
-          kubectl apply -f k8s/loadbalancer.yml && \
-          kubectl apply -f k8s/hpa.yml && \
-          kubectl rollout restart deployment lanchonete-deployment
-
-# sed -i.bak "s|jdbc:postgresql://postgres-svc:5432/postgres|jdbc:postgresql://$RDS_HOSTNAME:5432/postgres|g" k8s/deployment-app.yml && \
