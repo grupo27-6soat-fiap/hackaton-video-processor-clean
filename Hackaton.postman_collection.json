@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "13668fed-8811-4647-bd86-e6676ff33d60",
+		"name": "Hackaton",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6695097"
+	},
+	"item": [
+		{
+			"name": "RealizarSolicitacao",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJraWQiOiJBcWZRc0tPZHd1bjJiNWxSVEhEcVdvWnZlTUlmM3lETDBQYmxtaTZ0QmlVPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiaHlNZXNsRldCTGU4NDFJak02OTVnUSIsInN1YiI6IjM0ZjgzNGI4LTMwYTEtNzAzOC1iYmUwLTg1ZTc0ZmE4OWQ3ZiIsImF1ZCI6Im85bWFqamtkdTJsOHQ2ZTF2ZmtqcGJvMWsiLCJldmVudF9pZCI6ImFhMzg0MDg1LTYyMWQtNDhmZi04Y2MzLTAzNjIyMmI4ZjA0MSIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNzM5MjI2MDAxLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV80TU1VUWFXMkgiLCJjb2duaXRvOnVzZXJuYW1lIjoiZmVsaXBlcmVpczE5OTJAZ21haWwuY29tIiwiZXhwIjoxNzM5MjI5NjAxLCJpYXQiOjE3MzkyMjYwMDEsImp0aSI6ImQ1NjY1MWFjLTY1MjUtNGI0OC1hMjMxLWM0NzBjZmRjMzc4ZCJ9.nNpu4GKhHz__WRihF5MNztb4y-9qnF9FMzFDua7PhdozPk45vg1tgcpRnlLlpx_a-8APdodbLBJP4vQZ7HhNQB7WCJ0bumZPk5fxl7GvKt7of8qfK0flTLZ3MRr97-qOBxwA0blHzhYvBfbw8z6mgIteOT940z3dsDRUkLnWbbyO3tfQg3yF75nXSb12GvtvO62hLwzOHqwv_5X0wuRrDTVTT7_GIquUEdJLEJohk5mQQnXTXJ1LHFvhCxVxsN41J0Aqf6hYufvY2mKBtPX0wqenOqp_Wt79N9s8BztjYiptIjwksz2S4S8X7KEnswrajdUIf-IiKQuVB6cb6Cz9uw",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "arquivos",
+							"type": "file",
+							"src": [
+								"/C:/Users/felip/OneDrive/Área de Trabalho/canyon.mp4",
+								"/C:/Users/felip/OneDrive/Área de Trabalho/danca.mp4"
+							]
+						},
+						{
+							"key": "solicitante",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://a9b275e9290414c2aaabfb64f91fa52b-2145463973.us-east-1.elb.amazonaws.com/api/solicitacoes",
+					"protocol": "http",
+					"host": [
+						"a9b275e9290414c2aaabfb64f91fa52b-2145463973",
+						"us-east-1",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"solicitacoes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AtualizaStatus",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "arquivos",
+							"type": "file",
+							"src": [
+								"/C:/Users/User/OneDrive/Área de Trabalho/chaves_festaDaVizinhanca.mp4",
+								"/C:/Users/User/OneDrive/Área de Trabalho/chaves_acapulco.mp4"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/solicitacoes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"solicitacoes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "obterSolicitacoes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"idSolicitacao\": 18,\r\n    \"idArquivo\": 15,\r\n    \"status\": \"CONCLUIDO\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/solicitacoes?idSolicitante=55",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"solicitacoes"
+					],
+					"query": [
+						{
+							"key": "idSolicitante",
+							"value": "55"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
