@@ -20,7 +20,7 @@ public class BucketGatewayImpl implements BucketGateway {
     private final S3Adapter s3Adapter;
 
     public BucketGatewayImpl(@Value("${cloud.aws.s3.bucket}")String bucketName, S3Adapter s3Adapter) {
-        this.bucketName = bucketName;
+        this.bucketName = System.getenv().getOrDefault("AWS_S3_BUCKET_NAME", bucketName);
         this.s3Adapter = s3Adapter;
 
 

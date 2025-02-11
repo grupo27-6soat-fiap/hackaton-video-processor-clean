@@ -4,5 +4,5 @@ public enum StatusSolicitacao {
     PENDENTE,
     EM_PROCESSAMENTO,
     CONCLUIDO,
-    ERRO;
+    ERRO
 }

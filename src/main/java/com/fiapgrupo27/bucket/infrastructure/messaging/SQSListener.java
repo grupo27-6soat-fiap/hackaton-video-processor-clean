@@ -25,7 +25,7 @@ public class SQSListener {
 
     public SQSListener(ProcessVideoUseCase processVideoUseCase, @Value("${cloud.aws.sqs.queue-url}") String queueUrl, SqsClient sqsClient, ObjectMapper objectMapper) {
         this.processVideoUseCase = processVideoUseCase;
-        this.queueUrl = queueUrl;
+        this.queueUrl = System.getenv().getOrDefault("AWS_SQS_QUEUE_URL", queueUrl);;
         this.sqsClient = sqsClient;
         this.objectMapper = objectMapper;
     }
@@ -64,7 +64,8 @@ public class SQSListener {
             Integer idSolicitacao = (Integer) mensagem.get("idSolicitacao");
             String nomeArquivo = (String) mensagem.get("nomeArquivo");
             String idArquivo = String.valueOf(mensagem.get("idArquivo"));
-            processVideoUseCase.processarVideo(idSolicitacao.toString(), nomeArquivo, idArquivo);
+            String email = String.valueOf(mensagem.get("email"));
+            processVideoUseCase.processarVideo(idSolicitacao.toString(), nomeArquivo, idArquivo, email);
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

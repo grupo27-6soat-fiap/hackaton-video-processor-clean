@@ -19,7 +19,7 @@ public class S3Adapter {
 
     public S3Adapter(S3Client s3Client, @Value("${aws.s3.bucket-name}") String bucketName) {
         this.s3Client = s3Client;
-        this.bucketName = bucketName;
+        this.bucketName = System.getenv().getOrDefault("AWS_S3_BUCKET_NAME", bucketName);
     }
 
     public Path downloadFile(String nomeArquivo) {

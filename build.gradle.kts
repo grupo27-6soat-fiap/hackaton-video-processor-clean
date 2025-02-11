@@ -25,6 +25,7 @@ dependencies {
 
 
 
+
     // AWS SDK para S3
     implementation("software.amazon.awssdk:s3:2.20.148")
 
@@ -32,6 +33,8 @@ dependencies {
     implementation("software.amazon.awssdk:s3:2.20.20")
     implementation("software.amazon.awssdk:sqs:2.20.20")
 
+    // AWS Mail SES
+    implementation("software.amazon.awssdk:ses:2.20.91")
 
     // Testes com JUnit
     testImplementation("org.springframework.boot:spring-boot-starter-test")
