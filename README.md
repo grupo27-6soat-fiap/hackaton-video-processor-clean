@@ -1,6 +1,4 @@
 # MovieTech
-[![NPM](https://img.shields.io/npm/l/react)](https://github.com/grupo27-6soat-fiap/FoodTech/blob/ac0b311cf474702ef975e8d188af4a854badcd0f/LICENSE)
-
 ## GRUPO 27 - 6SOAT 
 
 ## Autores
@@ -21,7 +19,6 @@
 # Tecnologias utilizadas
 
 - ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
-- ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 - ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 - ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
 - ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
@@ -36,9 +33,6 @@ MovieTech é um projeto que desenvolve uma aplicação de edição de Vídeos, c
 Vale destacar que os requisitos fornecidos aos alunos não incluíam a parte de frontend.
 O objetivo deste projeto é implementar um sistema que atenda às necessidades dos Usuários. O sistema visa proporcionar autonomia, escalabilidade, resiliência e praticidade em todos os aspectos de sua implementação.
 Para desenvolver este software, utilizamos a metodologia DDD (Domain Driven Design). Aplicando esses conceitos, conseguimos nos aprofundar nos requisitos e proporcionar uma experiência agradável e eficiente aos nossos clientes.
-
-### Link Swagger (Executar após rodar a aplicação no Kubernetes):
-[![Swagger](https://img.shields.io/badge/Swagger-%2380BFFF.svg?style=for-the-badge&logo=swagger&logoColor=white)](http://localhost:30002/swagger-ui/index.html)
 
 ## Domain-driven design
 ![image](https://github.com/grupo27-6soat-fiap/hackaton-video-processor-clean/blob/master/Brainstorming.jpg)
