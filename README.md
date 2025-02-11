@@ -37,19 +37,118 @@ Para desenvolver este software, utilizamos a metodologia DDD (Domain Driven Desi
 ## Domain-driven design
 ![image](https://github.com/grupo27-6soat-fiap/hackaton-video-processor-clean/blob/master/Brainstorming.jpg)
 
+## Linguagem Ubíqua
+ ```bash
+
+Usuário
+ - Descrição: Pessoa que utiliza o sistema para editar vídeos.
+Ações Principais:
+ - Criar Projeto: Iniciar um novo projeto de edição de vídeo.
+ - Importar Mídia: Adicionar vídeos ao Editor.
+ - Fazer Download do Vídeo: Exportar o vídeo editado em um formato final.
+
+Editor
+ - Descrição: Sistema responsável por refinar o projeto, aplicar ajustes avançados e garantir a qualidade final.
+Ações Principais:
+ - Acessar Projeto: Receber e abrir vídeos enviados pelo Usuário.
+ - Gerenciar Camadas: Organizar elementos de vídeo com trechos específicos.
+ - Compactar Arquivos: Gerar arquivo comprimido com os arquivos resultantes do processamento.
+ - Disponibilizar o Projeto: Exportar a versão final com qualidade e formato ideais.
+
+Processamento
+ - Descrição: Módulo automatizado que executa tarefas técnicas no sistema.
+Ações Principais:
+ - Processar Vídeo: Combinar todas as camadas e efeitos em um arquivo final.
+ - Gerar Arquivos: Gerar imagens de acordo com o formato definido na regra de negócio
+```
+
 ## Cobertura de Testes 
 ![image](https://github.com/grupo27-6soat-fiap/hackaton-video-processor-clean/blob/master/Cobertura%20de%20Teste%20-%20Processor.png)
 
 # Para acessar a Collection da API Postman clique na imagem:
 [![Postman](https://img.shields.io/badge/Postman-%23FF6C37.svg?style=for-the-badge&logo=postman&logoColor=white)
-](https://github.com/grupo27-6soat-fiap/FoodTech/blob/d3f3ef36e8a29110127a1fbbd6bbf869c77d5dfc/CollectionAPIPostman.json)
+](https://github.com/grupo27-6soat-fiap/hackaton-video-processor-clean/blob/master/Hackaton.postman_collection.json)
 
 # Arquitetura Infraestrutura Kubernetes:
-Visando atender os requisitos do nosso projeto utilizamos a arquitetura Kubernetes em conjunto com o Docker como provedor de infraestrutura, aproveitando ao máximo os recursos nativos oferecidos pela plataforma. Dentro do cluster Kubernetes, estabelecemos o namespace "food-techchallenge-api" para agrupar todos os recursos diretamente relacionados à nossa aplicação. Além disso, reservamos o namespace "db_techfood" para nosso banco de dados gerenciado internamente pelo Kubernetes. Dentro do namespace "food-techchallenge-api", adotamos uma abordagem de segmentação dos componentes com base em suas responsabilidades específicas, o que facilita a visualização e compreensão da nossa estrutura arquitetônica. Essa prática visa proporcionar uma organização clara e intuitiva dos elementos que compõem a aplicação. Na imagem abaixo ilustramos como está sendo arquitetado o processo e também a comunicação entre eles, onde estamos expondo para a internet na porta 30002 nossa aplicação Java com Springboot e intermante na temos a aplicação MySql sendo executada em um outro pode, para persistir os dados criamos um volume para o banco e toda essa comunicação da aplicação com a base de dados está sendo feita através das services, para provisionar uma escalabilidade ao nosso projeto estamos utilizando o HPA que é responsável por verificar as métricas dos pod's e criar replicas para atender a necessidade de requisições.
 ![image](https://github.com/grupo27-6soat-fiap/hackaton-video-processor-clean/blob/master/Desenho%20da%20Arquitetura.png)
+## 🏗️ Arquitetura do Ambiente AWS
+
+### 📌 Visão Geral
+O ambiente foi estruturado na **AWS** utilizando **Amazon EKS (Elastic Kubernetes Service)** para orquestração de containers, garantindo escalabilidade, segurança e alta disponibilidade para os serviços. Além disso, utilizamos diversos serviços AWS para **autenticação, processamento de vídeos, armazenamento e envio de notificações**, garantindo um fluxo eficiente e desacoplado.
+
+---
+
+## 🏛️ Componentes Principais
+
+### 1️⃣ Orquestração com **Amazon EKS**
+Nosso cluster **EKS** gerencia os deployments dos serviços dentro do **Kubernetes**, garantindo que os workloads sejam executados de forma escalável e segura. Temos dois principais deployments dentro do cluster:
+
+- **Solicitacao Deployment (Service)** → Responsável pelo recebimento das solicitações dos usuários, autenticação e interação com os demais serviços.
+- **Video Deployment (Processor)** → Processa os vídeos enviados, interagindo com os serviços de armazenamento e notificações.
+
+O uso do **EKS** garante que nossa aplicação seja **resiliente**, permitindo autoescalonamento dos pods e garantindo **alta disponibilidade**.
+
+---
+
+### 2️⃣ Segurança e Autenticação - **Amazon Cognito**
+A autenticação dos usuários é gerenciada pelo **Amazon Cognito**, um serviço que permite autenticação segura utilizando:
+- **Usuário/senha**
+
+O Cognito garante que apenas usuários autenticados possam interagir com a aplicação, oferecendo recursos como **Multi-Factor Authentication (MFA)** e **gerenciamento seguro de tokens JWT**.
+
+---
+
+### 3️⃣ Banco de Dados Relacional - **Amazon RDS (PostgreSQL)**
+O serviço **Solicitacao Deployment** acessa um banco de dados **PostgreSQL** hospedado no **Amazon RDS**, garantindo **persistência dos dados com alta disponibilidade**.  
+📌 **Motivos para escolher PostgreSQL:**
+- **Relacionamentos complexos** entre entidades (ex: Clientes, Pedidos, Produtos)
+- **Consultas SQL eficientes e escaláveis**
+
+---
+
+### 4️⃣ Processamento de Vídeos - **Amazon S3 e Amazon SQS**
+O fluxo de processamento de vídeos envolve os seguintes componentes:
+
+#### 🔹 **1. Upload e Armazenamento**
+- Os vídeos carregados pelos usuários são enviados para o **Amazon S3 (Video Processing Bucket)**, garantindo **armazenamento escalável e seguro**.
+
+#### 🔹 **2. Fila de Processamento - Amazon SQS**
+- Após o upload, o **Solicitacao Deployment** envia uma mensagem para a **Video Processing Queue (Amazon SQS)**.
+- Isso permite **desacoplar os serviços** e garantir **escalabilidade**, pois os vídeos podem ser processados de forma assíncrona.
+
+#### 🔹 **3. Processamento - Video Deployment (Processor)**
+- O **Processor** recebe mensagens da fila **SQS**, baixa os vídeos do **S3**, executa o processamento e gera os arquivos finais (exemplo: extração de frames, compactação, etc.).
+- Após o processamento, o **status da solicitação é atualizado** no banco de dados.
+
+---
+
+### 5️⃣ Envio de Notificações - **Amazon SES**
+Após o processamento do vídeo, um e-mail de notificação é enviado ao usuário através do **Amazon Simple Email Service (SES)**.
+- O **Processor** dispara um evento de conclusão, enviando um e-mail automaticamente para o usuário informando sobre o status do seu vídeo.
+- O **Amazon SES** garante alta entregabilidade e segurança na comunicação via e-mail.
+
+---
+
+## 🔄 Fluxo Completo da Aplicação
+1️⃣ O usuário acessa a aplicação e realiza login via **Amazon Cognito**.  
+2️⃣ Após autenticação, o usuário envia uma solicitação via **Solicitacao Deployment**.  
+3️⃣ Os dados são armazenados no **PostgreSQL (RDS)** e os vídeos são enviados para o **Amazon S3**.  
+4️⃣ Uma mensagem é enviada para a **Video Processing Queue (SQS)** para iniciar o processamento.  
+5️⃣ O **Processor (Video Deployment)** lê a fila, processa os vídeos e salva os resultados.  
+6️⃣ Após a conclusão, o **status é atualizado** no banco de dados e um e-mail é enviado via **Amazon SES** notificando o usuário.  
+
+---
+
+## 🛠️ **Motivos para Escolher essa Arquitetura**
+✅ **Alta Disponibilidade e Escalabilidade** → Kubernetes (**EKS**) e serviços gerenciados garantem que a aplicação suporte grande volume de usuários e processamento de vídeos.  
+✅ **Desacoplamento de Serviços** → Uso de **Amazon SQS** para filas de mensagens permite que o processamento de vídeos seja assíncrono, evitando gargalos.  
+✅ **Segurança e Confiabilidade** → Uso de **Amazon Cognito** para autenticação e **IAM Policies** para controle de acesso a recursos da AWS.  
+✅ **Eficiência e Custo-Benefício** → Utilização de **S3 para armazenamento escalável** e **SES para notificações com baixo custo**.  
+
+Essa arquitetura garante **eficiência, segurança e escalabilidade**, permitindo que a aplicação cresça de forma sustentável e confiável. 🚀
 
 ## Link Youtube:
-https://youtu.be/lomaGHcx33Q
+https://youtu.be/9oLeVEOWEJk
 
 ## Implementação
 Para implantar o projeto, utilizamos o conceito de containers com o Docker como ferramenta de gerenciamento. Nosso projeto usa tanto Dockerfile quanto Docker-compose. Utilizamos uma imagem do Java com Spring e uma imagem do Postgres para rodar o banco de dados localmente e realizar as operações de CRUD da nossa aplicação.
@@ -61,36 +160,6 @@ https://sonarcloud.io/project/overview?id=grupo27-6soat-fiap_grupo27-6soat-fiap-
 
 ## Back end
 Pré-requisitos: Java 17, JDK 17, Gradle, Postgres.
-
-# Como rodar local:
-
-```bash
-# clonar repositório
-git clone [https://github.com/grupo27-6soat-fiap/foodtech.git]
-
-# entrar na pasta do projeto food-techchallenge-api
-cd .\foodtech\
-
-# executar o projeto
-./gradlew bootRun
-```
-# Como rodar usando Docker Desktop:
-
-## Instalar o Docker Desktop:
-### Link para download:
-[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/products/docker-desktop/)
-
-
-```bash
-# clonar repositório
-git clone [https://github.com/grupo27-6soat-fiap/foodtech.git]
-
-# entrar na pasta do projeto food-techchallenge-api
-cd .\foodtech\
-
-# entrar no terminal e executar o seguinte comando
-docker compose up --build
-```
 
 # Como rodar usando Kubernetes Local:
 
@@ -105,10 +174,10 @@ docker compose up --build
 ### Após o Kubernetes incializar, seguir os próximos passos:
 
 ### Clonar repositório:
-git clone [https://github.com/grupo27-6soat-fiap/foodtech.git]
+git clone [https://github.com/grupo27-6soat-fiap/hackaton-video-processor-clean.git]
 
-### Entrar na pasta do projeto foodtech:
-cd .\foodtech\
+### Entrar na pasta do projeto :
+cd .\hackaton-solicitacao-service-clean\
 ### Abrir o PowerShell ou o terminal do computador
 ### Ordem de execução dos arquivos Yaml:
 1 - Executar os arquivos da pasta foodtech/k8s:
@@ -116,9 +185,9 @@ cd .\foodtech\
  - 1.2 - kubectl apply -f ./k8s/statefulset-postgress.yml
  - 1.3 - kubectl apply -f ./k8s/service-postgress.yml
  - 1.4 - kubectl apply -f ./k8s/service-app.yml
- - 1.5 - kubectl apply -f ./k8s/secret-payment.yml
- - 1.6 - kubectl apply -f ./k8s/deployment-app.yml
- - 1.7 - kubectl apply -f ./k8s/hpa.yml
+ - 1.5 - kubectl apply -f .k8s/localstack-deployment.yml
+ - 1.5 - kubectl apply -f ./k8s/deployment-app.yml
+ - 1.6 - kubectl apply -f ./k8s/hpa.yml
    
 2 - Alterar a porta da rota no postman quando o Kubernetes estiver rodando
   - Porta: 30002 (Kubernetes)
@@ -133,72 +202,26 @@ Este guia fornece instruções para configurar o ambiente necessário e executar
 
 ## Repositórios Necessários
 
-1. [foodtech-infra-eks](https://github.com/grupo27-6soat-fiap/foodtech-infra-eks.git)
-2. [foodtech-infra-rds](https://github.com/grupo27-6soat-fiap/foodtech-infra-rds.git)
-3. [foodtech-infra-cognito](https://github.com/grupo27-6soat-fiap/foodtech-infra-cognito.git)
-4. [foodtech-infra-dynamoDB](https://github.com/grupo27-6soat-fiap/foodtech-infra-dynamoDB.git)
-5. [foodtech-lambda](https://github.com/grupo27-6soat-fiap/foodtech-lambda.git)
-6. [foodtech](https://github.com/grupo27-6soat-fiap/foodtech.git)
+1. [hackaton-infra-eks](https://github.com/grupo27-6soat-fiap/hackaton-infra-eks)
+2. [hackaton-infra-rds](https://github.com/grupo27-6soat-fiap/hackaton-infra-rds)
+3. [hackaton-infra-cognito](https://github.com/grupo27-6soat-fiap/hackaton-infra-cognito)
+4. [hackaton-solicitacao-service](https://github.com/grupo27-6soat-fiap/hackaton-solicitacao-service.git)
 
 ## Ordem de Execução dos Workflows Terraform
 
 A seguir estão os passos para executar os workflows Terraform, que provisionam toda a infraestrutura necessária:
 
-### Passo 1 - foodtech-infra-eks
+### Passo 1 - hackaton-infra-eks
 - Executar o workflow para provisionar o cluster EKS que será utilizado pela aplicação.
 
-### Passo 2 - foodtech-infra-dynamoDB
-- Executar o workflow para provisionar a base de dados no DynamoDB.
-
-### Passo 3 - foodtech-infra-cognito
+### Passo 2 - hackaton-infra-cognito
 - Executar o workflow para provisionar o serviço Cognito que gerenciará a autenticação.
 
-### Passo 4 - foodtech-infra-rds
+### Passo 3 - hackaton-infra-rds
 - Executar o workflow para provisionar o banco de dados RDS.
 
-### Passo 5 - foodtech-lambda (criação do API Gateway incluída)
-- Executar o workflow para provisionar a Lambda e configurar o API Gateway.
-- **Atenção**: Para o workflow da Lambda, é necessário que as seguintes secrets sejam criadas/atualizadas no GitHub Actions:
-  - `CLIENT_ID_COGNITO`: client ID da AppIntegration do Cognito.
-  - `PASSWORD_COGNITO`: senha do usuário que foi criado no Cognito.
-  - `USERNAME_COGNITO`: nome do usuário criado no Cognito.
+### Passo 4 - foodtech-lambda (criação do API Gateway incluída)
 
-### Passo 6 - foodtech
-- Executar o workflow para rodar a aplicação no cluster EKS provisionado.
-- **Atenção**: Para a aplicação rodar corretamente na AWS, é necessário que as seguintes secrets sejam criadas/atualizadas no GitHub Actions:
-  - `RDS_HOSTNAME`: endpoint do banco de dados RDS (ex: `rds-foodtech.c5o24sqc6d2p.us-east-1.rds.amazonaws.com`).
-  - `REPO_NAME`: nome do repositório no ECR (ex: `foodtech`).
-  - **Atualização no Projeto**:
-    - Arquivo `.oodtech\k8s\secret-postgress.yml`:
-      - Atualizar a seção `data` com os seguintes campos:
-        - `username`: usuário criado no RDS (padrão: `dbadmin`, codificado em Base64 - `ZGJhZG1pbg==`).
-        - `password`: senha criada no RDS (a senha padrão é gerada automaticamente, necessário obter no console da AWS: RDS -> Databases -> `rds-foodtech` -> Configuration -> Manage in Secrets Manager).
+### Passo 5 - hackaton-solicitacao-service
 
 
-
-## Linguagem Ubíqua
- ```bash
-
-Entidades e Papéis
-
-Usuário
-  •	Descrição: Pessoa que utiliza o sistema para editar vídeos.
-Ações Principais:
-  •	Criar Projeto: Iniciar um novo projeto de edição de vídeo.
-  •	Importar Mídia: Adicionar vídeos ao Editor.
-  •	Fazer Download do Vídeo: Exportar o vídeo editado em um formato final.
-
-Editor
-  •	Descrição: Sistema responsável por refinar o projeto, aplicar ajustes avançados e garantir a qualidade final.
-Ações Principais:
-  •	Acessar Projeto: Receber e abrir vídeos enviados pelo Usuário.
-  •	Gerenciar Camadas: Organizar elementos de vídeo com trechos específicos.
-  •	Compactar Arquivos: Gerar arquivo comprimido com os arquivos resultantes do processamento.
-  •	Disponibilizar o Projeto: Exportar a versão final com qualidade e formato ideais.
-
-Processamento
-  •	Descrição: Módulo automatizado que executa tarefas técnicas no sistema.
-Ações Principais:
-  •	Processar Vídeo: Combinar todas as camadas e efeitos em um arquivo final.
-  •	Gerar Arquivos: Gerar imagens de acordo com o formato definido na regra de negócio
-```
