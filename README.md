@@ -163,6 +163,8 @@ Pré-requisitos: Java 17, JDK 17, Gradle, Postgres.
 
 # Como rodar usando Kubernetes Local:
 
+### Iniciar o localstack através do comando: localstack start
+
 ### Após instalar o Docker Desktop, ativar no Docker Desktop a opção do Kubernetes:
 
 ### Clicar em Settings (Configuração)
