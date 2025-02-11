@@ -16,9 +16,10 @@ public class ProcessVideoUseCase {
     private final RemoveFramesUseCase removeFramesUseCase;
     private final AtualizarStatusUseCase atualizarStatusUseCase;
     private final UploadFileUseCase uploadFileUseCase;
+    private final EnviaEmailUseCase enviaEmailUseCase;
 
 
-    public ProcessVideoUseCase(DownloadFileUseCase downloadFileUseCase, ExtractFramesUseCase extractFramesUseCase, CompressFramesUseCase compressFramesUseCase, RemoveFramesUseCase removeFramesUseCase, AtualizarStatusUseCase atualizarStatusUseCase, UploadFileUseCase uploadFileUseCase) {
+    public ProcessVideoUseCase(DownloadFileUseCase downloadFileUseCase, ExtractFramesUseCase extractFramesUseCase, CompressFramesUseCase compressFramesUseCase, RemoveFramesUseCase removeFramesUseCase, AtualizarStatusUseCase atualizarStatusUseCase, UploadFileUseCase uploadFileUseCase, EnviaEmailUseCase enviaEmailUseCase) {
 
         this.downloadFileUseCase = downloadFileUseCase;
         this.extractFramesUseCase = extractFramesUseCase;
@@ -26,9 +27,10 @@ public class ProcessVideoUseCase {
         this.removeFramesUseCase = removeFramesUseCase;
         this.atualizarStatusUseCase = atualizarStatusUseCase;
         this.uploadFileUseCase = uploadFileUseCase;
+        this.enviaEmailUseCase = enviaEmailUseCase;
     }
 
-    public void processarVideo(String idSolicitacao, String nomeArquivo,String idArquivo) {
+    public void processarVideo(String idSolicitacao, String nomeArquivo,String idArquivo, String email) {
         Path arquivoBaixado = downloadFileUseCase.downloadFile(nomeArquivo);
         String videoPath = arquivoBaixado.toString(); // Caminho do vídeo no disco
         String outputDir = videoPath + "_frames"; // Diretório de saída dos frames
@@ -56,11 +58,14 @@ public class ProcessVideoUseCase {
                 AtualizarStatusDTO statusDTO = new AtualizarStatusDTO(idSolicitacao, idArquivo, StatusSolicitacao.CONCLUIDO);
                 atualizarStatusUseCase.atualizarStatus(statusDTO);
 
+
                 // Remover Sujeira
                 removeFramesUseCase.removerFrames(outputDir, videoPath, baseNameReplaced);
 
+                enviaEmailUseCase.enviaEmailComStatus(email, idSolicitacao.toString(),"Geração realizada com sucesso! " + destinoS3);
 
             } catch (IOException | InterruptedException e) {
+                enviaEmailUseCase.enviaEmailComStatus(email, idSolicitacao.toString(), "Ocorreu um erro na geração do arquivo: " + arquivoBaixado.toString());
                 throw new RuntimeException(e);
             }
         }

@@ -3,6 +3,7 @@ package com.fiapgrupo27.bucket.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiapgrupo27.bucket.application.gateways.ArquivoGateway;
 import com.fiapgrupo27.bucket.application.gateways.BucketGateway;
+import com.fiapgrupo27.bucket.application.gateways.EmailGateway;
 import com.fiapgrupo27.bucket.application.gateways.SolicitacaoGateway;
 import com.fiapgrupo27.bucket.application.usecases.*;
 import com.fiapgrupo27.bucket.infrastructure.messaging.SQSListener;
@@ -85,6 +86,9 @@ public class VideoProcessorConfig {
         return new UploadFileUseCase(bucketGateway); // Supondo que precise do BucketGateway
     }
 
+    public EnviaEmailUseCase enviaEmailUseCase(EmailGateway emailGateway) {
+        return new EnviaEmailUseCase(emailGateway);
+    }
     @Bean
     public ProcessVideoUseCase processVideoUseCase(
             DownloadFileUseCase downloadFileUseCase,
@@ -92,7 +96,8 @@ public class VideoProcessorConfig {
             CompressFramesUseCase compressFramesUseCase,
             RemoveFramesUseCase removeFramesUseCase,
             AtualizarStatusUseCase atualizarStatusUseCase,
-            UploadFileUseCase uploadFileUseCase) {
+            UploadFileUseCase uploadFileUseCase,
+            EnviaEmailUseCase enviaEmailUseCase) {
 
         return new ProcessVideoUseCase(
                 downloadFileUseCase,
@@ -100,7 +105,8 @@ public class VideoProcessorConfig {
                 compressFramesUseCase,
                 removeFramesUseCase,
                 atualizarStatusUseCase,
-                uploadFileUseCase
+                uploadFileUseCase,
+                enviaEmailUseCase
         );
     }
 
