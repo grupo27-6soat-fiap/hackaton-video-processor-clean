@@ -31,6 +31,7 @@ public class ProcessVideoUseCase {
     }
 
     public void processarVideo(String idSolicitacao, String nomeArquivo,String idArquivo, String email) {
+
         Path arquivoBaixado = downloadFileUseCase.downloadFile(nomeArquivo);
         String videoPath = arquivoBaixado.toString(); // Caminho do vídeo no disco
         String outputDir = videoPath + "_frames"; // Diretório de saída dos frames
