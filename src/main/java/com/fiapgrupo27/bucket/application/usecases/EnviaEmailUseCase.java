@@ -1,7 +1,9 @@
 package com.fiapgrupo27.bucket.application.usecases;
 
 import com.fiapgrupo27.bucket.application.gateways.EmailGateway;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EnviaEmailUseCase {
     private final EmailGateway emailGateway;
 
