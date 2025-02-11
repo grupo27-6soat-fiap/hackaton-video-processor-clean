@@ -64,7 +64,8 @@ public class SQSListener {
             Integer idSolicitacao = (Integer) mensagem.get("idSolicitacao");
             String nomeArquivo = (String) mensagem.get("nomeArquivo");
             String idArquivo = String.valueOf(mensagem.get("idArquivo"));
-            processVideoUseCase.processarVideo(idSolicitacao.toString(), nomeArquivo, idArquivo);
+            String email = String.valueOf(mensagem.get("email"));
+            processVideoUseCase.processarVideo(idSolicitacao.toString(), nomeArquivo, idArquivo, email);
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
